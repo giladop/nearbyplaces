@@ -1,0 +1,8 @@
+<resources>
+	<string name="app_name">Places</string>
+	<string name="title_activity_home">Places</string>
+	<string name="nearby_address_name_hint">Nearby places</string>
+	<string name="na">N/A</string>
+	<string name="select_location">Places around</string>
+	<string name="no_places_found">No places found</string>
+</resources>

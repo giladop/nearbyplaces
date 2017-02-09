@@ -1,0 +1,29 @@
+<LinearLayout
+	android:name="com.google.android.gms.maps.SupportMapFragment"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="horizontal">
+
+	<fragment
+		android:id="@+id/map_places_fragment"
+		android:layout_width="0dp"
+		android:layout_height="match_parent"
+		android:layout_weight="0.65"
+		class="com.places.view.MapPlacesFragment"/>
+
+
+	<View
+		android:layout_width="1dp"
+		android:layout_height="match_parent"
+		android:background="@android:color/darker_gray"/>
+
+	<fragment
+		android:layout_marginTop="25dp"
+		android:id="@+id/places_fragment"
+		android:layout_width="0dp"
+		android:layout_height="match_parent"
+		android:layout_weight="0.35"
+		class="com.places.view.PlacesListFragment"/>
+
+</LinearLayout>
