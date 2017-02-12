@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,6 +107,15 @@ public class MapPlacesFragment extends android.support.v4.app.Fragment implement
 	}
 
 
+
+	@Override
+	public void onResume(){
+		super.onResume();
+		genericPlaceIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_place_black_24dp);
+	}
+
+
+
 	/**
 	 * Save last known location.
 	 */
@@ -195,46 +205,6 @@ public class MapPlacesFragment extends android.support.v4.app.Fragment implement
 	}
 
 
-	/**
-	 * Update map with latest places near map center. Add only new places,
-	 * remove old places that not appear in the new list.
-	 */
-	public void updateMapPlaces(List<Place> places){
-
-		BitmapDescriptor genericPlaceIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_place_black_24dp);
-		Set<String> placeIds = new HashSet<>();
-		for (Place place : places){
-
-			placeIds.add(place.id);
-			if (placeMarkers.containsKey(place.id))
-				continue;
-
-			LatLng latLng = new LatLng(place.geometry.location.lat, place.geometry.location.lng);
-			MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-					.title(place.name)
-					.icon(genericPlaceIcon);
-
-			markerOptionsList.put(place.id, markerOptions);
-		}
-
-		if (map != null)
-			updateMapMarkers();
-
-		//remove old markers
-		List<String> markersToRemove = new ArrayList<>();
-		for (Map.Entry<String, Marker> entry : placeMarkers.entrySet()){
-
-			if (!placeIds.contains(entry.getKey())){
-				markersToRemove.add(entry.getKey());
-				entry.getValue().remove();
-			}
-		}
-
-		for (String key : markersToRemove){
-			Marker marker = placeMarkers.remove(key);
-			marker.remove();
-		}
-	}
 
 	private synchronized void updateMapMarkers(){
 		if (markerOptionsList.isEmpty()) return;
@@ -308,6 +278,44 @@ public class MapPlacesFragment extends android.support.v4.app.Fragment implement
 	public LatLng getCurrentLocation(){
 		return currentLocation;
 	}
+
+
+	/**
+	 * Update map with latest places near map center. Add only new places,
+	 * remove old places that not appear in the new list.
+	 */
+	public void onNearByMapPlacesLoaded(List<Place> placesToAdd, List<Place> placesToRemove){
+
+
+		addNewPlacesToMap(placesToAdd);
+
+		if (placesToRemove == null) return;
+		for (Place placeToRemove : placesToRemove){
+			Marker markerToRemove = placeMarkers.get(placeToRemove.id);
+			if (markerToRemove != null)
+				markerToRemove.remove();
+			else
+				Log.w("Map fragment", "trying to remove non exist marker - something wrong");
+		}
+
+	}
+
+	private void addNewPlacesToMap(List<Place> placesToAdd){
+
+		for (Place placeToAdd : placesToAdd){
+
+			LatLng latLng = new LatLng(placeToAdd.geometry.location.lat, placeToAdd.geometry.location.lng);
+			MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+					.title(placeToAdd.name)
+					.icon(genericPlaceIcon);
+			if (map != null){
+				Marker markerTOAdd = map.addMarker(markerOptions);
+				placeMarkers.put(placeToAdd.id, markerTOAdd);
+			}else
+				markerOptionsList.put(placeToAdd.id, markerOptions);
+		}
+	}
+
 
 
 	/**

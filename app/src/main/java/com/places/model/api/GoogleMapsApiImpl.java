@@ -9,10 +9,11 @@ import javax.inject.Inject;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import com.places.model.PlacesDataSource;
-import com.places.model.api.GoogleMapsApi;
+
 import com.places.model.data.Addresses;
 import com.places.model.data.Places;
+import com.places.model.repository.RemoteRepository;
+
 
 
 /**
@@ -39,7 +40,7 @@ public class GoogleMapsApiImpl{
 	/**
 	 * Reverse geocode
 	 */
-	public void getAddress(@NonNull LatLng location, @NonNull final PlacesDataSource.GetAddressCallback callback){
+	public void getAddress(@NonNull LatLng location, @NonNull final RemoteRepository.GetAddressCallback callback){
 		String locationParam = location.latitude + "," + location.longitude;
 		api.getAddress(locationParam).enqueue(new Callback<Addresses>(){
 			@Override
@@ -58,7 +59,7 @@ public class GoogleMapsApiImpl{
 	/**
 	 * Nearby places.
 	 */
-	public void getPlaces(@NonNull LatLng location, @NonNull final PlacesDataSource.GetPlacesCallback callback){
+	public void getPlaces(@NonNull LatLng location, @NonNull final RemoteRepository.GetPlacesCallback callback){
 		String locationParam = location.latitude + "," + location.longitude;
 		api.getPlaces(locationParam).enqueue(new Callback<Places>(){
 			@Override

@@ -23,7 +23,7 @@ import com.places.di.PlacesComponent;
 import com.places.di.PlacesModule;
 import com.places.model.data.Place;
 import com.places.presenter.NearbyPlacesPresenter;
-import com.places.presenter.NearbyPlacesPresenterContract;
+import com.places.presenter.NearbyPlacesPresenterViewContract;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ import javax.inject.Inject;
  * Dragging the map, refreshing both map and list. If permission granted, the user location will be shown on map.
  */
 public class NearbyPlacesActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
-		LocationListener, GoogleApiClient.OnConnectionFailedListener, NearbyPlacesPresenterContract.View,
+		LocationListener, GoogleApiClient.OnConnectionFailedListener, NearbyPlacesPresenterViewContract.View,
 		MapPlacesFragment.MapMoveListener, PlacesListFragment.PlacesListListener{
 
 
@@ -155,7 +155,12 @@ public class NearbyPlacesActivity extends FragmentActivity implements GoogleApiC
 	@Override
 	public void onNearByPlacesLoaded(List<Place> places){
 		getPlacesListFragment().setPlaces(places);
-		getMapPlacesFragment().updateMapPlaces(places);
+	}
+
+
+	@Override
+	public void onNearByMapPlacesLoaded(List<Place> placesToAdd, List<Place> placesToRemove){
+		getMapPlacesFragment().onNearByMapPlacesLoaded(placesToAdd, placesToRemove);
 	}
 
 

@@ -1,4 +1,4 @@
-package com.places.model;
+package com.places.presenter;
 
 import android.support.annotation.NonNull;
 
@@ -6,26 +6,26 @@ import com.google.android.gms.maps.model.LatLng;
 
 import com.places.model.data.Addresses;
 import com.places.model.data.Places;
-import com.places.presenter.NearbyPlacesPresenter;
+import com.places.model.repository.NearbyPlacesRepository;
 
 
 
 /**
- * The contract between {@link NearbyPlacesPresenter} and API layer.
+ * The contract between {@link NearbyPlacesPresenter} and {@link NearbyPlacesRepository}.
  *
  * @author Gilad Opher
  */
-public interface PlacesDataSource{
+public interface PresenterRepositoryContract{
 
 
 
 	/**
-	 * Call back from API layer
+	 * Call back from data repository layer
 	 */
 	interface GetPlacesCallback {
 
 
-		void onPlacesLoaded(Places places);
+		void onPlacesLoaded(Places places, Places oldPlaces);
 
 
 		void onPlacesNotAvailable();
@@ -34,7 +34,7 @@ public interface PlacesDataSource{
 
 
 	/**
-	 * Call back from API layer
+	 * Call back from data repository
 	 */
 	interface GetAddressCallback {
 

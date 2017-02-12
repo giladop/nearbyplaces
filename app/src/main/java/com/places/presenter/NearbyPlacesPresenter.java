@@ -1,17 +1,19 @@
 package com.places.presenter;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import javax.inject.Inject;
 
-import com.places.model.PlacesRepository;
-import com.places.presenter.NearbyPlacesPresenterContract;
+import com.places.model.repository.NearbyPlacesRepository;
 
 import com.places.model.data.Addresses;
-import com.places.model.PlacesDataSource;
+import com.places.model.data.Place;
 import com.places.model.data.Places;
+
+import java.util.*;
 
 
 
@@ -20,37 +22,37 @@ import com.places.model.data.Places;
  *
  * @author Gilad Opher
  */
-public class NearbyPlacesPresenter implements NearbyPlacesPresenterContract.UserActionsListener
-	,PlacesDataSource.GetAddressCallback, PlacesDataSource.GetPlacesCallback{
+public class NearbyPlacesPresenter implements NearbyPlacesPresenterViewContract.UserActionsListener
+	,PresenterRepositoryContract.GetAddressCallback, PresenterRepositoryContract.GetPlacesCallback{
 
 
 	/**
 	 * The view.
 	 */
-	private NearbyPlacesPresenterContract.View theView;
+	private NearbyPlacesPresenterViewContract.View theView;
 
 
 	/**
 	 * The data
 	 */
-	private PlacesDataSource repository;
+	private PresenterRepositoryContract repository;
 
 
 	@Inject
-	public NearbyPlacesPresenter(PlacesDataSource repository){
+	public NearbyPlacesPresenter(PresenterRepositoryContract repository){
 		this.repository = repository;
 	}
 
 
 	/* for testing purpose */
-	public NearbyPlacesPresenter(PlacesDataSource repository, NearbyPlacesPresenterContract.View theView){
+	public NearbyPlacesPresenter(PresenterRepositoryContract repository, NearbyPlacesPresenterViewContract.View theView){
 		this.repository = repository;
 		this.theView = theView;
 	}
 
 
 	/**
-	 * Get {@link Addresses} from {@link PlacesRepository} if return true invoke show loading indicator.
+	 * Get {@link Addresses} from {@link NearbyPlacesRepository} if return true invoke show loading indicator.
 	 */
 	@Override
 	public void getAddress(@NonNull LatLng location){
@@ -62,7 +64,7 @@ public class NearbyPlacesPresenter implements NearbyPlacesPresenterContract.User
 
 
 	/**
-	 * Get {@link Places} from {@link PlacesRepository} if return true invoke show loading indicator.
+	 * Get {@link Places} from {@link NearbyPlacesRepository} if return true invoke show loading indicator.
 	 */
 	@Override
 	public void getNearByPlaces(@NonNull LatLng location){
@@ -78,7 +80,7 @@ public class NearbyPlacesPresenter implements NearbyPlacesPresenterContract.User
 	 * connect view and presenter.
 	 */
 	@Override
-	public void bind(NearbyPlacesPresenterContract.View view){
+	public void bind(NearbyPlacesPresenterViewContract.View view){
 		this.theView = view;
 	}
 
@@ -129,18 +131,69 @@ public class NearbyPlacesPresenter implements NearbyPlacesPresenterContract.User
 
 
 	/**
-	 * if data is valid, return success result to view. otherwise return places were not found.
+	 * if data is valid and view is available, return success result to view. otherwise return places were not found.
 	 */
 	@Override
-	public void onPlacesLoaded(Places places){
+	public void onPlacesLoaded(Places places, Places oldPlaces){
 		if (theView == null) return;
 
 		theView.hidePlacesProgressIndicator();
 		if (places == null || places.placeList == null || places.placeList.isEmpty())
 			theView.onPlacesNotAvailable();
-		else
+		else{
+
 			theView.onNearByPlacesLoaded(places.placeList);
+
+			List<Place> placesToAdd = findNewPlaces(places, oldPlaces);
+			List<Place> placesToRemove = findMissingPlaces(places, oldPlaces);
+			theView.onNearByMapPlacesLoaded(placesToAdd, placesToRemove);
+		}
 	}
+
+
+
+	/**
+	 * For map presenting purpose find only new places that needed to add to map.
+	 */
+	private List<Place> findNewPlaces(@NonNull Places places, @Nullable Places oldPlaces){
+		if (oldPlaces == null) return places.placeList;
+
+		return findDistinctPlaces(places.placeList, oldPlaces.placeList);
+	}
+
+
+
+	/**
+	 * For map presenting purpose find only places that needed to be removed from map.
+	 */
+	private List<Place> findMissingPlaces(@NonNull Places places, @Nullable Places oldPlaces){
+		if (oldPlaces == null) return null;
+
+		return findDistinctPlaces(oldPlaces.placeList, places.placeList);
+	}
+
+
+
+	/**
+	 * Return distinct elements between two lists.
+	 */
+	private List<Place> findDistinctPlaces(@NonNull List<Place> from, @NonNull List<Place> to){
+
+		Set<Place> toSet = new HashSet<>();
+		for(Place toPlace : to)
+			toSet.add(toPlace);
+
+		List<Place> distinct = new ArrayList<>();
+		for(Place place : from){
+			if (!toSet.contains(place))
+				distinct.add(place);
+		}
+
+		return distinct;
+	}
+
+
+
 
 
 	/**

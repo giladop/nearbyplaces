@@ -1,19 +1,14 @@
-package com.places.model;
+package com.places.model.repository;
 
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
-
-import org.junit.Before;
-import org.mockito.MockitoAnnotations;
+import com.places.presenter.PresenterRepositoryContract;
+import com.places.model.data.Addresses;
+import com.places.model.data.Places;
 
 import javax.inject.Inject;
-
-import com.places.model.data.*;
-import com.places.model.remote.RemotePlacesDataSource;
-import com.places.presenter.NearbyPlacesPresenter;
 
 
 
@@ -24,14 +19,14 @@ import com.places.presenter.NearbyPlacesPresenter;
  *
  * @author Gilad Opher
  */
-public class PlacesRepository implements PlacesDataSource{
+public class NearbyPlacesRepository implements PresenterRepositoryContract{
 
 
 
 	/**
 	 * The data source that we'll use for getting data from.
 	 */
-	private PlacesDataSource placesDataSource;
+	private RemoteRepository remoteRepository;
 
 
 	/**
@@ -47,8 +42,8 @@ public class PlacesRepository implements PlacesDataSource{
 
 
 	@Inject
-	public PlacesRepository(RemotePlacesDataSource placesDataSource){
-		this.placesDataSource = placesDataSource;
+	public NearbyPlacesRepository(RemotePlacesRepository placesDataSource){
+		this.remoteRepository = placesDataSource;
 	}
 
 
@@ -64,7 +59,7 @@ public class PlacesRepository implements PlacesDataSource{
 			return false;
 		}
 
-		placesDataSource.getAddress(location, new GetAddressCallback(){
+		remoteRepository.getAddress(location, new RemoteRepository.GetAddressCallback(){
 			@Override
 			public void onAddressLoaded(Addresses address){
 				if (validAddress(address))
@@ -82,6 +77,7 @@ public class PlacesRepository implements PlacesDataSource{
 	}
 
 
+
 	/**
 	 * Get {@link Places} by {@link LatLng}.
 	 * In case {@link Places} in cache return false to presenter (indication for not showing loading)
@@ -91,17 +87,18 @@ public class PlacesRepository implements PlacesDataSource{
 	public boolean getPlaces(@NonNull final LatLng location, @NonNull final GetPlacesCallback callback){
 
 		if (placesCache != null && placesCache.first != null && placesCache.first.equals(location)){
-			callback.onPlacesLoaded(placesCache.second);
+			callback.onPlacesLoaded(placesCache.second, null);
 			return false;
 		}
 
-		placesDataSource.getPlaces(location, new GetPlacesCallback(){
+		remoteRepository.getPlaces(location, new RemoteRepository.GetPlacesCallback(){
 			@Override
-			public void onPlacesLoaded(Places places){
-				if (validPlaces(places))
-					placesCache = Pair.create(location, places);
+			public void onPlacesLoaded(Places newPlaces){
+				Places oldPlaces = placesCache != null ? placesCache.second : null;
+				if (validPlaces(newPlaces))
+					placesCache = Pair.create(location, newPlaces);
 
-				callback.onPlacesLoaded(places);
+				callback.onPlacesLoaded(newPlaces, oldPlaces);
 			}
 
 			@Override
@@ -116,7 +113,7 @@ public class PlacesRepository implements PlacesDataSource{
 	/**
 	 * Check {@link Addresses} validation
 	 */
-	boolean validAddress(Addresses address){
+	public boolean validAddress(Addresses address){
 		return address != null && address.addressList != null && !address.addressList.isEmpty();
 	}
 

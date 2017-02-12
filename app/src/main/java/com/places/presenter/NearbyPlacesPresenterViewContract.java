@@ -13,7 +13,7 @@ import com.places.model.data.Place;
  *
  * @author Gilad Opher
  */
-public interface NearbyPlacesPresenterContract{
+public interface NearbyPlacesPresenterViewContract{
 
 
 	/**
@@ -35,6 +35,9 @@ public interface NearbyPlacesPresenterContract{
 
 
 		void onNearByPlacesLoaded(List<Place> places);
+
+
+		void onNearByMapPlacesLoaded(List<Place> placesToAdd, List<Place> placesToRemove);
 
 
 		void onAddressFound(String Address);

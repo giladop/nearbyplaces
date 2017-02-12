@@ -1,10 +1,10 @@
 package com.places.model;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.places.model.PlacesRepository;
 import com.places.model.data.Address;
 import com.places.model.data.Addresses;
-import com.places.model.remote.RemotePlacesDataSource;
+import com.places.model.repository.NearbyPlacesRepository;
+import com.places.model.repository.RemotePlacesRepository;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Gilad Opher
  */
-public class PlacesRepositoryTest{
+public class PlacesNearbyPlacesRepositoryTest{
 
 	private LatLng LOCATION = new LatLng(31.881905, 34.803593);
 	private LatLng OTHER_LOCATION = new LatLng(11.881905, 22.803593);
@@ -38,10 +38,10 @@ public class PlacesRepositoryTest{
 
 
 	@Mock
-	private RemotePlacesDataSource remotePlacesDataSource;
+	private RemotePlacesRepository remotePlacesRepository;
 
 
-	private PlacesRepository placesRepository;
+	private NearbyPlacesRepository placesNearbyPlacesRepository;
 
 	@Before
 	public void setupNotesPresenter() {
@@ -49,22 +49,22 @@ public class PlacesRepositoryTest{
 		MockitoAnnotations.initMocks(this);
 
 		// Get a reference to the class under test
-		placesRepository = new PlacesRepository(remotePlacesDataSource);
+		placesNearbyPlacesRepository = new NearbyPlacesRepository(remotePlacesRepository);
 	}
 
 	@Test
 	public void verifyValidAddress(){
-		assertEquals(placesRepository.validAddress(ADDRESSES_FULL), true);
+		assertEquals(placesNearbyPlacesRepository.validAddress(ADDRESSES_FULL), true);
 	}
 
 	@Test
 	public void verifyInvalidAddress(){
-		assertEquals(placesRepository.validAddress(null), false);
+		assertEquals(placesNearbyPlacesRepository.validAddress(null), false);
 	}
 
 	@Test
 	public void verifyEmptyAddress(){
-		assertEquals(placesRepository.validAddress(ADDRESSES_EMPTY), false);
+		assertEquals(placesNearbyPlacesRepository.validAddress(ADDRESSES_EMPTY), false);
 	}
 
 

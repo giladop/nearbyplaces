@@ -1,9 +1,8 @@
-package com.places.model.remote;
+package com.places.model.repository;
 
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.places.model.PlacesDataSource;
 import com.places.model.api.GoogleMapsApiImpl;
 import com.places.model.data.Addresses;
 import com.places.model.data.Places;
@@ -16,7 +15,7 @@ import javax.inject.Inject;
  *
  * @author Gilad Opher
  */
-public class RemotePlacesDataSource implements PlacesDataSource{
+public class RemotePlacesRepository implements RemoteRepository{
 
 
 	/**
@@ -26,14 +25,14 @@ public class RemotePlacesDataSource implements PlacesDataSource{
 
 
 	@Inject
-	public RemotePlacesDataSource(GoogleMapsApiImpl api){
+	public RemotePlacesRepository(GoogleMapsApiImpl api){
 		this.api = api;
 	}
 
 
 	@Override
 	public boolean getAddress(@NonNull LatLng location, @NonNull final GetAddressCallback callback){
-		api.getAddress(location, new GetAddressCallback(){
+		api.getAddress(location, new RemoteRepository.GetAddressCallback(){
 			@Override
 			public void onAddressLoaded(Addresses address){
 
@@ -50,11 +49,12 @@ public class RemotePlacesDataSource implements PlacesDataSource{
 
 
 	@Override
-	public boolean getPlaces(@NonNull LatLng location, @NonNull final GetPlacesCallback callback){
-		api.getPlaces(location, new GetPlacesCallback(){
+	public boolean getPlaces(@NonNull LatLng location, @NonNull final RemoteRepository.GetPlacesCallback callback){
+		api.getPlaces(location, new RemoteRepository.GetPlacesCallback(){
+
 			@Override
-			public void onPlacesLoaded(Places places){
-				callback.onPlacesLoaded(places);
+			public void onPlacesLoaded(Places newPlaces){
+				callback.onPlacesLoaded(newPlaces);
 			}
 
 			@Override
@@ -64,5 +64,4 @@ public class RemotePlacesDataSource implements PlacesDataSource{
 		});
 		return true;
 	}
-
 }

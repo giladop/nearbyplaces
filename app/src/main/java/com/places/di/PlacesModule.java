@@ -1,12 +1,13 @@
 package com.places.di;
 
+import com.places.model.repository.NearbyPlacesRepository;
+import com.places.model.api.GoogleMapsApiImpl;
+import com.places.model.repository.RemoteRepository;
+import com.places.model.repository.RemotePlacesRepository;
+import com.places.presenter.NearbyPlacesPresenter;
+
 import dagger.Module;
 import dagger.Provides;
-import com.places.model.api.GoogleMapsApiImpl;
-import com.places.model.PlacesDataSource;
-import com.places.model.PlacesRepository;
-import com.places.model.remote.RemotePlacesDataSource;
-import com.places.presenter.NearbyPlacesPresenter;
 
 
 
@@ -18,20 +19,20 @@ public class PlacesModule{
 
 
 	@Provides
-	PlacesDataSource providePlacesRemoteRepository(GoogleMapsApiImpl api){
-		return new RemotePlacesDataSource(api);
+	RemoteRepository providePlacesRemoteRepository(GoogleMapsApiImpl api){
+		return new RemotePlacesRepository(api);
 	}
 
 
 	@Provides
-	PlacesRepository providePlacesRepository(RemotePlacesDataSource remotePlacesDataSource){
-		return new PlacesRepository(remotePlacesDataSource);
+	NearbyPlacesRepository providePlacesRepository(RemotePlacesRepository remotePlacesRepository){
+		return new NearbyPlacesRepository(remotePlacesRepository);
 	}
 
 
 	@Provides
-	NearbyPlacesPresenter provideNearbyPlacesPresenter(PlacesRepository repository){
-		return new NearbyPlacesPresenter(repository);
+	NearbyPlacesPresenter provideNearbyPlacesPresenter(NearbyPlacesRepository nearbyPlacesRepository){
+		return new NearbyPlacesPresenter(nearbyPlacesRepository);
 	}
 
 }
