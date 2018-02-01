@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1076399795677",
+    "firebase_url": "https://places-10ba4.firebaseio.com",
+    "project_id": "places-10ba4",
+    "storage_bucket": "places-10ba4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1076399795677:android:df3e91f201dd289c",
+        "android_client_info": {
+          "package_name": "com.places"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1076399795677-1bqhqq6r9i4tjef0gj6kla9g56p2dkoi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGTD2BZmiABE4XZLVcZNPTKAhYFTJlt1A"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
